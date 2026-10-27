@@ -1,0 +1,62 @@
+### Quick manual tests (VS Code "REST Client" extension, or copy into Postman)
+@base = http://localhost:3000
+
+### Health
+GET {{base}}/health
+
+### Create accounts
+POST {{base}}/accounts
+Content-Type: application/json
+
+{ "name": "Account A" }
+
+###
+POST {{base}}/accounts
+Content-Type: application/json
+
+{ "name": "Account B" }
+
+### Seed balances (credit)
+POST {{base}}/transactions
+Content-Type: application/json
+
+{ "account_id": 1, "type": "credit", "amount": 100, "reference_id": "seed-1" }
+
+###
+POST {{base}}/transactions
+Content-Type: application/json
+
+{ "account_id": 2, "type": "credit", "amount": 50, "reference_id": "seed-2" }
+
+### Debit
+POST {{base}}/transactions
+Content-Type: application/json
+
+{ "account_id": 1, "type": "debit", "amount": 10.5, "reference_id": "pay-1", "description": "coffee" }
+
+### Transfer 30 from A to B  (A: 100 -> 70, B: 50 -> 80 if you skip the debit above)
+POST {{base}}/transfers
+Content-Type: application/json
+
+{ "from_account_id": 1, "to_account_id": 2, "amount": 30, "reference_id": "tr-1" }
+
+### List accounts
+GET {{base}}/accounts?page=1&limit=20
+
+### One account
+GET {{base}}/accounts/1
+
+### Transactions of an account (optional type filter)
+GET {{base}}/accounts/1/transactions?page=1&limit=20&type=debit
+
+### Error examples
+POST {{base}}/transactions
+Content-Type: application/json
+
+{ "account_id": 1, "type": "debit", "amount": 999999, "reference_id": "too-much" }
+
+###
+GET {{base}}/accounts/9999
+
+###
+GET {{base}}/accounts/1/transactions?page=0
